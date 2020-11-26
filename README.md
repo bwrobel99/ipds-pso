@@ -1,6 +1,6 @@
 # ipds-pso
 
-**IDPS** - Intelligent Pizza Delivery System - is a Python-driven program that optimizes the process of delivering pizza using the **PSO** (Particle Swarm Optimization).
+**IDPS** - Intelligent Pizza Delivery System - is a Python-driven program that optimizes the process of delivering pizza using the **PSO** (Particle Swarm Optimization) algorithm.
 
 # Authors
 * **Jan Wacek** github.com/wacus99 

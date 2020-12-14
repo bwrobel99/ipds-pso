@@ -8,11 +8,11 @@ from scipy import integrate
 
 
 def main():
-    lst_of_points = [[10, 0],
-                     [15, 0], [20, 0],
-                     [50, 0]]
+    lst_of_points = [[3, -1],
+                     [4, 1], [0, 1],
+                     [3, 2]]
     restaurant_loc = [0, 0]
-    petrol_loactions = [[1, 0], [2, 0]]
+    petrol_loactions = [[1, 1], [3, 2], [0, 3]]
     s = Solver(100, 100, lst_of_points, restaurant_loc, petrol_loactions)
     s.solve()
     print(s.gBest)

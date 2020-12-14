@@ -187,20 +187,22 @@ class Solver:
                     self.gBest = list_of_particle[it]
 
         fuel_enough = self.is_fuel_enough(copy.copy(self.gBest))
-        best = []
-        current_cost = -1
+
         if fuel_enough < len(self.gBest):
+            best = []
+            current_cost = np.inf
             for i in range(fuel_enough + 1):
                 for p in range(len(self.petrol_locations)):
                     route = copy.copy(self.gBest)
                     route.insert(i, p+10)
                     cost = self.calculate_part_cost(route, self.locations, self.petrol_locations)
-                    if current_cost == -1 or cost < current_cost:
+                    if current_cost == np.inf or cost < current_cost:
                         current_cost = cost
                         best = route
+            self.gBest = best
+            self.gBest_cost = current_cost
 
-        self.gBest = best
-        self.gBest_cost = current_cost
+
 
         del_time = self.count_time()
         print(del_time)

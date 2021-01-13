@@ -1,0 +1,1 @@
+longitude_min: 19.9241 longitude_max: 19.9525 latitude_min: 50.0695 latitude_max: 50.0573

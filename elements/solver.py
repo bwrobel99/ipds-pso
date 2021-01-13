@@ -14,7 +14,7 @@ class Solver:
         self.locations = locations
         self.resturant_location = resturant_location
         self.speed = []
-        self.fuel = 5
+        self.fuel = 2.5
         self.fuel_cons_per_100km = 9
         self.petrol_locations = petrol_locations
         self.gBest = []
@@ -112,15 +112,18 @@ class Solver:
                     dict.append(diff[p1])
 
     def is_fuel_enough(self, particle):
-        particle_cost = self.calculate_part_cost(particle, self.locations)
-        fuel_need = particle_cost / 100 * self.fuel_cons_per_100km
+        if particle:
+            particle_cost = self.calculate_part_cost(particle, self.locations)
+            fuel_need = particle_cost / 100 * self.fuel_cons_per_100km
 
-        route = particle
-        if fuel_need < self.fuel + 2:
-            return len(particle)
+            route = particle
+            if fuel_need + 2 < self.fuel:
+                return len(particle)
 
-        del route[-1]
-        return self.is_fuel_enough(route)
+            del route[-1]
+            return self.is_fuel_enough(route)
+        else:
+            return 0
 
     def count_time(self):
         delivery_time = []
@@ -133,7 +136,11 @@ class Solver:
                 else:
                     route += 1000 * self.route_between_points(self.resturant_location, self.petrol_locations[self.gBest[i] - 10])
                 time = self.calculate_time(route)
+<<<<<<< HEAD
                 delivery_time.append(time/60.)
+=======
+                delivery_time.append(time/60)
+>>>>>>> 4a8034c598f0806604b9eb5272ffed544b513264
             else:
                 if self.gBest[i] >= 10:
                     route += 1000 * self.route_between_points(self.locations[self.gBest[i-1] - 1], self.petrol_locations[self.gBest[i] - 10])
@@ -143,8 +150,12 @@ class Solver:
                     route += 1000 * self.route_between_points(self.locations[self.gBest[i - 1] - 1], self.locations[self.gBest[i] - 1])
 
                 time = self.calculate_time(route)
+<<<<<<< HEAD
                 delivery_time.append(time/60.)
 
+=======
+                delivery_time.append(time/60)
+>>>>>>> 4a8034c598f0806604b9eb5272ffed544b513264
 
         return delivery_time
 

@@ -136,11 +136,8 @@ class Solver:
                 else:
                     route += 1000 * self.route_between_points(self.resturant_location, self.petrol_locations[self.gBest[i] - 10])
                 time = self.calculate_time(route)
-<<<<<<< HEAD
-                delivery_time.append(time/60.)
-=======
                 delivery_time.append(time/60)
->>>>>>> 4a8034c598f0806604b9eb5272ffed544b513264
+
             else:
                 if self.gBest[i] >= 10:
                     route += 1000 * self.route_between_points(self.locations[self.gBest[i-1] - 1], self.petrol_locations[self.gBest[i] - 10])
@@ -150,13 +147,8 @@ class Solver:
                     route += 1000 * self.route_between_points(self.locations[self.gBest[i - 1] - 1], self.locations[self.gBest[i] - 1])
 
                 time = self.calculate_time(route)
-<<<<<<< HEAD
-                delivery_time.append(time/60.)
 
-=======
                 delivery_time.append(time/60)
->>>>>>> 4a8034c598f0806604b9eb5272ffed544b513264
-
         return delivery_time
 
 

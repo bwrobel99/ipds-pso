@@ -1,4 +1,3 @@
-from elements.particle import Particle
 from elements.solver import Solver
 from elements.graph import Graph
 from random import random
@@ -18,7 +17,7 @@ def main():
     s = Solver(100, 100, lst_of_points, restaurant_loc, petrol_loactions)
     s.solve()
     print(s.gBest)
-    print(s.gBest_cost * 111)
+    print(s.gBest_cost)
     right_order = s.gBest
     graph = Graph()
     longitudes , latitudes = graph.upgrade_points(restaurant_loc=restaurant_loc, right_order=right_order, lst_of_points=lst_of_points, petrol_loactions=petrol_loactions)

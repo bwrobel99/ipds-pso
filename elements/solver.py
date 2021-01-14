@@ -203,8 +203,14 @@ class Solver:
                     if current_cost == np.inf or cost < current_cost:
                         current_cost = cost
                         best = route
+
+
             self.gBest = best
             self.gBest_cost = current_cost * 111
+
+        else:
+            self.gBest_cost *=111
+
 
         del_time = self.count_time()
         print(del_time)

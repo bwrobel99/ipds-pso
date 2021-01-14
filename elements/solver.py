@@ -14,8 +14,8 @@ class Solver:
         self.locations = locations
         self.resturant_location = resturant_location
         self.speed = []
-        self.fuel = 2.5
-        self.fuel_cons_per_100km = 9
+        self.fuel = 6
+        self.fuel_cons_per_100km = 20
         self.petrol_locations = petrol_locations
         self.gBest = []
         self.gBest_cost = 0
@@ -113,11 +113,11 @@ class Solver:
 
     def is_fuel_enough(self, particle):
         if particle:
-            particle_cost = self.calculate_part_cost(particle, self.locations)
+            particle_cost = self.calculate_part_cost(particle, self.locations)*111
             fuel_need = particle_cost / 100 * self.fuel_cons_per_100km
 
             route = particle
-            if fuel_need + 2 < self.fuel:
+            if fuel_need + 5 < self.fuel:
                 return len(particle)
 
             del route[-1]
@@ -132,25 +132,24 @@ class Solver:
         for i in range(len(self.gBest)):
             if i == 0:
                 if self.gBest[i] < 10:
-                    route += 1000 * self.route_between_points(self.resturant_location, self.locations[self.gBest[i] - 1])
+                    route += 1000 * 111  * self.route_between_points(self.resturant_location, self.locations[self.gBest[i] - 1])
                 else:
-                    route += 1000 * self.route_between_points(self.resturant_location, self.petrol_locations[self.gBest[i] - 10])
+                    route += 1000 * 111 * self.route_between_points(self.resturant_location, self.petrol_locations[self.gBest[i] - 10])
                 time = self.calculate_time(route)
-                delivery_time.append(time/60)
+                delivery_time.append(time/60 + (5 * i))
 
             else:
                 if self.gBest[i] >= 10:
-                    route += 1000 * self.route_between_points(self.locations[self.gBest[i-1] - 1], self.petrol_locations[self.gBest[i] - 10])
+                    route += 1000 * 111 * self.route_between_points(self.locations[self.gBest[i-1] - 1], self.petrol_locations[self.gBest[i] - 10])
                 elif self.gBest[i-1] >= 10:
-                    route += 1000 * self.route_between_points(self.petrol_locations[self.gBest[i - 1] - 10], self.locations[self.gBest[i] - 1])
+                    route += 1000 * 111 * self.route_between_points(self.petrol_locations[self.gBest[i - 1] - 10], self.locations[self.gBest[i] - 1])
                 else:
-                    route += 1000 * self.route_between_points(self.locations[self.gBest[i - 1] - 1], self.locations[self.gBest[i] - 1])
+                    route += 1000 * 111 * self.route_between_points(self.locations[self.gBest[i - 1] - 1], self.locations[self.gBest[i] - 1])
 
                 time = self.calculate_time(route)
 
-                delivery_time.append(time/60)
+                delivery_time.append(time/60 + (5 * i))
         return delivery_time
-
 
     def solve(self):
         list_of_particle = []
@@ -161,11 +160,11 @@ class Solver:
 
         self.gBest = 0
 
-        for i in range(self.num_swarm):                                     #   Losowanie stada i predkosci
-            list_of_particle.append(random.sample(range(1, l+1), k=l))
-            dict_of_vel[i] = [(random.sample(range(1, l+1), k=2))]
+        for i in range(self.num_swarm):  # Losowanie stada i predkosci
+            list_of_particle.append(random.sample(range(1, l + 1), k=l))
+            dict_of_vel[i] = [(random.sample(range(1, l + 1), k=2))]
 
-        list_of_pBest = copy.deepcopy(list_of_particle)                     #   Obliczanie kosztu dla wylosowanego stada
+        list_of_pBest = copy.deepcopy(list_of_particle)  # Obliczanie kosztu dla wylosowanego stada
         lst_of_pBest_cost = self.calculate_full_cost(
             list_of_pBest, self.locations)
         self.gBest_cost = min(lst_of_pBest_cost)
@@ -174,16 +173,17 @@ class Solver:
 
         for i in range(self.num_iterations):
             for it in range(self.num_swarm):
-                diff1 = self.diff(list_of_particle[it], list_of_pBest[it])  #   Wyznaczanie różnic: cząsteczka - pBest [x(i) - pBest]
-                diff2 = self.diff(list_of_particle[it], self.gBest)         #                       cząsteczka - gBest [x(i) - gBest]
+                diff1 = self.diff(list_of_particle[it],
+                                  list_of_pBest[it])  # Wyznaczanie różnic: cząsteczka - pBest [x(i) - pBest]
+                diff2 = self.diff(list_of_particle[it], self.gBest)  # cząsteczka - gBest [x(i) - gBest]
                 self.check_diff(diff1, dict_of_vel[it])
                 self.check_diff(diff2, dict_of_vel[it])
                 for el in range(len(dict_of_vel[it])):
-                    if dict_of_vel[it][el]:                         #   Zastosowanie predkosci dla stada
+                    if dict_of_vel[it][el]:  # Zastosowanie predkosci dla stada
                         list_of_particle[it] = self.swap(
-                                            list_of_particle[it], dict_of_vel[it][el][0], dict_of_vel[it][el][1])
+                            list_of_particle[it], dict_of_vel[it][el][0], dict_of_vel[it][el][1])
             costs = self.calculate_full_cost(list_of_particle, self.locations)
-            for it in range(self.num_swarm):                        #   Aktualizowanie pBest oraz gBest
+            for it in range(self.num_swarm):  # Aktualizowanie pBest oraz gBest
                 if costs[it] < lst_of_pBest_cost[it]:
                     list_of_pBest[it] = list_of_particle[it]
                     lst_of_pBest_cost[it] = costs[it]
@@ -198,15 +198,13 @@ class Solver:
             for i in range(fuel_enough + 1):
                 for p in range(len(self.petrol_locations)):
                     route = copy.copy(self.gBest)
-                    route.insert(i, p+10)
+                    route.insert(i, p + 10)
                     cost = self.calculate_part_cost(route, self.locations, self.petrol_locations)
                     if current_cost == np.inf or cost < current_cost:
                         current_cost = cost
                         best = route
             self.gBest = best
-            self.gBest_cost = current_cost
-
-
+            self.gBest_cost = current_cost * 111
 
         del_time = self.count_time()
         print(del_time)

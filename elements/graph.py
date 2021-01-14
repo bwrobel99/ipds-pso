@@ -15,16 +15,15 @@ class Graph:
         for value in self.dct.values():
             self.bbox.append(value)
 
-    def upgrade_points(self, restaurant_loc, right_order, lst_of_points):
+    def upgrade_points(self, restaurant_loc, right_order, lst_of_points, petrol_loactions):
         ordered_points = []
         for order in right_order:
-            if order == right_order[0]:
-                ordered_points.append(restaurant_loc)
-            for index, point in enumerate(lst_of_points):
-                if order == (index + 1):
-                    ordered_points.append(point)
-                    if order == right_order[-1]:
-                        ordered_points.append(restaurant_loc)
+            if order >= 10:
+                ordered_points.append(petrol_loactions[order - 10])
+            else:
+                ordered_points.append(lst_of_points[order - 1])
+        ordered_points.append(restaurant_loc)
+        ordered_points.insert(0, restaurant_loc)
 
         longitudes = []
         latitudes = []
@@ -34,13 +33,23 @@ class Graph:
 
         return longitudes, latitudes
 
-    def show_graph(self, longitudes, latitudes):
+    def show_graph(self, longitudes, latitudes, petrol_locations, restaurant_loc, lst_of_points):
         map = plt.imread(os.path.join(self.maps_directory, 'uno.png'))
         fig, ax = plt.subplots(figsize=(8, 7))
-        # ax.scatter(longitudes,latitudes, zorder = 1, alpha = 0.8, c='r', s=10)
-        # ax.scatter(petrol_longitudes, petrol_latitudes, zorder=1, alpha=1, c='y', s=30, marker = 'D')
-        # ax.scatter(restaurant_loc[0], restaurant_loc[1], zorder = 1, alpha = 1, c='b', s=30, marker = 's')
-        ax.plot(longitudes, latitudes, zorder=1, alpha=0.8, ls='--', c='r', marker='D')
+        petrol_long = []
+        petrol_lat = []
+        points_long = []
+        points_lat = []
+        for i in lst_of_points:
+            points_long.append(i[0])
+            points_lat.append(i[1])
+
+        for i in petrol_locations:
+            petrol_long.append(i[0])
+            petrol_lat.append(i[1])
+
+
+        ax.plot(longitudes, latitudes, zorder=1, alpha=0.8, ls='--', c='r')
         for i in range(len(longitudes) - 1):
             if i == 0:
                 ax.annotate('Pozycja restauracji', xy=(longitudes[i], latitudes[i]))
@@ -51,10 +60,12 @@ class Graph:
         ax.set_xlim(self.bbox[0], self.bbox[1])
         ax.set_ylim(self.bbox[2], self.bbox[3])
 
+        ax.scatter(petrol_long, petrol_lat, zorder=1, alpha=1, c='y', s=30, marker='D')
+        ax.scatter(points_long, points_lat, zorder=1, alpha=0.8, c='r', s=30, marker = 'o')
+        ax.scatter(restaurant_loc[0], restaurant_loc[1], zorder = 1, alpha = 1, c='b', s=30, marker = 's')
+        for i in range(len(petrol_long)):
+            ax.annotate(f'Stacja benzynowa nr{i}', xy=(petrol_long[i], petrol_lat[i]))
+
         ax.imshow(map, zorder=0, extent=self.bbox, aspect='equal')
         plt.show()
         fig.savefig(os.path.join(self.trace_directory, 'trace1.png'))
-
-
-    def get_cost_matrix(self):
-        pass

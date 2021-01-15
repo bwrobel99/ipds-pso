@@ -28,7 +28,7 @@ class Solver:
 
     def diff(self, a, b):
         list_of_diff = []
-        b_buff = b[:]
+        b_buff = copy.deepcopy(b)
         if len(a) != len(b):
             print("Blad! Różne długości tablic")
             return -1
@@ -40,8 +40,8 @@ class Solver:
                     ind = b_buff.index(a[i])
                     if ind == -1:
                         return -1
-                    list_of_diff.append([i+1, ind])
-                    self.swap(b_buff, i+1, ind)
+                    list_of_diff.append([i+1, ind+1])
+                    self.swap(b_buff, i+1, ind+1)
         return list_of_diff
 
     def generate_speed(self, t):
@@ -113,17 +113,7 @@ class Solver:
         check = False
         if diff:
             for p1 in range(len(diff)):  # Dodawanie powyższych predkosci do predkosci wcześniejszej
-                for c1 in range(len(dict)):  # Wedlug wzoru: v(i+1) = v(i) + [x(i) - pBest] + [x(i) - g Best]
-                    check = False
-                    if dict[c1]:
-                        if dict[c1][0] == diff[p1][0] and dict[c1][1] == diff[p1][1]:
-                            dict[c1].clear()  # Sprawdzanie powtorzenia dla diff 1
-                            check = True
-                        elif dict[c1][0] == diff[p1][1] and dict[c1][1] == diff[p1][0]:
-                            dict[c1].clear()
-                            check = True
-                if not check:
-                    dict.append(diff[p1])
+                dict.append(diff[p1])
 
     def is_fuel_enough(self, particle):
         if particle:
@@ -169,6 +159,7 @@ class Solver:
         list_of_particle = []
         dict_of_vel = {}
         list_of_pBest = []
+        cnt = 0
 
         l = len(self.locations)
 
@@ -176,7 +167,7 @@ class Solver:
 
         for i in range(self.num_swarm):  # Losowanie stada i predkosci
             list_of_particle.append(random.sample(range(1, l + 1), k=l))
-            dict_of_vel[i] = [(random.sample(range(1, l + 1), k=2))]
+            dict_of_vel[i] = [(random.sample(range(1, l + 1), k=2)), (random.sample(range(1, l + 1), k=2))]
 
         list_of_pBest = copy.deepcopy(list_of_particle)  # Obliczanie kosztu dla wylosowanego stada
         lst_of_pBest_cost = self.calculate_full_cost(
@@ -185,11 +176,13 @@ class Solver:
         index_gBest = lst_of_pBest_cost.index(self.gBest_cost)
         self.gBest = list_of_pBest[index_gBest]
 
+
+
         for i in range(self.num_iterations):
             for it in range(self.num_swarm):
-                diff1 = self.diff(list_of_particle[it],
-                                  list_of_pBest[it])  # Wyznaczanie różnic: cząsteczka - pBest [x(i) - pBest]
-                diff2 = self.diff(list_of_particle[it], self.gBest)  # cząsteczka - gBest [x(i) - gBest]
+                diff1 = self.diff(list_of_particle[it], list_of_pBest[it])  # Wyznaczanie różnic: cząsteczka - pBest [x(i) - pBest]
+                diff2 = self.diff(list_of_particle[it], self.gBest)
+                # cząsteczka - gBest [x(i) - gBest]
                 self.check_diff(diff1, dict_of_vel[it])
                 self.check_diff(diff2, dict_of_vel[it])
                 for el in range(len(dict_of_vel[it])):
@@ -204,7 +197,9 @@ class Solver:
                 if costs[it] < self.gBest_cost:
                     self.gBest = copy.deepcopy(list_of_particle[it])
                     self.gBest_cost = costs[it]
-
+                    cnt = i+1
+            print(copy.deepcopy(list_of_pBest))
+            print([el*111 for el in costs])
         fuel_enough = self.is_fuel_enough(copy.copy(self.gBest))
 
         if fuel_enough < len(self.gBest):
@@ -228,8 +223,10 @@ class Solver:
 
 
         del_time = self.count_time()
-        print(del_time)
-        print(self.calculate_pizza_temp_tab(del_time))
+        # print(del_time)
+        # print(self.calculate_pizza_temp_tab(del_time))
+        # print(self.gBest_cost)
+        # print(cnt)
 
 
 

@@ -109,7 +109,7 @@ class Solver:
             pizza_temp_tab.append(self.calculate_pizza_temp(i))
         return pizza_temp_tab
 
-    def check_diff(self, diff, dict):
+    def add_diff(self, diff, dict):
         check = False
         if diff:
             for p1 in range(len(diff)):  # Dodawanie powyższych predkosci do predkosci wcześniejszej
@@ -140,7 +140,8 @@ class Solver:
                 else:
                     route += 1000 * 111 * self.route_between_points(self.resturant_location, self.petrol_locations[self.gBest[i] - 10])
                 time = self.calculate_time(route)
-                delivery_time.append(time/60 + (5 * (i+1)))
+                time = time/60 + (5 * (i+1))
+                delivery_time.append(np.around(time,decimals=2))
 
             else:
                 if self.gBest[i] >= 10:
@@ -151,8 +152,9 @@ class Solver:
                     route += 1000 * 111 * self.route_between_points(self.locations[self.gBest[i - 1] - 1], self.locations[self.gBest[i] - 1])
 
                 time = self.calculate_time(route)
+                time = time/60 + (5 * (i+1))
 
-                delivery_time.append(time/60 + (5 * (i+1)))
+                delivery_time.append(np.around(time, decimals=2))
         return delivery_time
 
     def solve(self):
@@ -183,8 +185,8 @@ class Solver:
                 diff1 = self.diff(list_of_particle[it], list_of_pBest[it])  # Wyznaczanie różnic: cząsteczka - pBest [x(i) - pBest]
                 diff2 = self.diff(list_of_particle[it], self.gBest)
                 # cząsteczka - gBest [x(i) - gBest]
-                self.check_diff(diff1, dict_of_vel[it])
-                self.check_diff(diff2, dict_of_vel[it])
+                self.add_diff(diff1, dict_of_vel[it])
+                self.add_diff(diff2, dict_of_vel[it])
                 for el in range(len(dict_of_vel[it])):
                     if dict_of_vel[it][el]:  # Zastosowanie predkosci dla stada
                         list_of_particle[it] = self.swap(
@@ -198,8 +200,7 @@ class Solver:
                     self.gBest = copy.deepcopy(list_of_particle[it])
                     self.gBest_cost = costs[it]
                     cnt = i+1
-            print(copy.deepcopy(list_of_pBest))
-            print([el*111 for el in costs])
+
         fuel_enough = self.is_fuel_enough(copy.copy(self.gBest))
 
         if fuel_enough < len(self.gBest):
@@ -223,10 +224,10 @@ class Solver:
 
 
         del_time = self.count_time()
-        # print(del_time)
-        # print(self.calculate_pizza_temp_tab(del_time))
-        # print(self.gBest_cost)
-        # print(cnt)
+        print(f"Czas dostawy [min]: {del_time}")
+        pizza_temp = self.calculate_pizza_temp_tab(del_time)
+        print(f"Temperatura pizzy [st.C]: {pizza_temp}")
+
 
 
 

@@ -17,8 +17,8 @@ def main():
     s = Solver(25, 25, lst_of_points, restaurant_loc, petrol_loactions)
 
     s.solve()
-    print(s.gBest)
-    print(s.gBest_cost)
+    print(f"Kolejność dostawy pizzy: {s.gBest}")
+    print(f"Długość trasy [km]: {np.around(s.gBest_cost,2)}")
     right_order = s.gBest
     graph = Graph()
     longitudes , latitudes = graph.upgrade_points(restaurant_loc=restaurant_loc, right_order=right_order, lst_of_points=lst_of_points, petrol_loactions=petrol_loactions)

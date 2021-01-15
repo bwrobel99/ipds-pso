@@ -14,7 +14,7 @@ class Solver:
         self.locations = locations
         self.resturant_location = resturant_location
         self.speed = []
-        self.fuel = 6
+        self.fuel = 60
         self.fuel_cons_per_100km = 20
         self.petrol_locations = petrol_locations
         self.gBest = []
@@ -95,6 +95,20 @@ class Solver:
             lst_of_cost.append(cal)
         return lst_of_cost
 
+    def calculate_pizza_temp(self,delivery_time):
+        if delivery_time <= 10:
+            return 80
+        elif delivery_time > 40:
+            return 20
+        else:
+            return np.floor(800/delivery_time)
+
+    def calculate_pizza_temp_tab(self,delivery_time_tab):
+        pizza_temp_tab = []
+        for i in delivery_time_tab:
+            pizza_temp_tab.append(self.calculate_pizza_temp(i))
+        return pizza_temp_tab
+
     def check_diff(self, diff, dict):
         check = False
         if diff:
@@ -136,7 +150,7 @@ class Solver:
                 else:
                     route += 1000 * 111 * self.route_between_points(self.resturant_location, self.petrol_locations[self.gBest[i] - 10])
                 time = self.calculate_time(route)
-                delivery_time.append(time/60 + (5 * i))
+                delivery_time.append(time/60 + (5 * (i+1)))
 
             else:
                 if self.gBest[i] >= 10:
@@ -148,7 +162,7 @@ class Solver:
 
                 time = self.calculate_time(route)
 
-                delivery_time.append(time/60 + (5 * i))
+                delivery_time.append(time/60 + (5 * (i+1)))
         return delivery_time
 
     def solve(self):
@@ -185,10 +199,11 @@ class Solver:
             costs = self.calculate_full_cost(list_of_particle, self.locations)
             for it in range(self.num_swarm):  # Aktualizowanie pBest oraz gBest
                 if costs[it] < lst_of_pBest_cost[it]:
-                    list_of_pBest[it] = list_of_particle[it]
+                    list_of_pBest[it] = copy.deepcopy(list_of_particle[it])
                     lst_of_pBest_cost[it] = costs[it]
                 if costs[it] < self.gBest_cost:
-                    self.gBest = list_of_particle[it]
+                    self.gBest = copy.deepcopy(list_of_particle[it])
+                    self.gBest_cost = costs[it]
 
         fuel_enough = self.is_fuel_enough(copy.copy(self.gBest))
 
@@ -214,6 +229,9 @@ class Solver:
 
         del_time = self.count_time()
         print(del_time)
+        print(self.calculate_pizza_temp_tab(del_time))
+
+
 
 
 

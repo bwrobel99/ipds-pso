@@ -19,7 +19,7 @@ def calculate():
     lst_of_points = data['places'][1:]
     restaurant_loc = data['places'][0]
     petrol_locations = [[50.06, 19.92]]
-    s = Solver(25, 25, 5.5, lst_of_points, restaurant_loc, petrol_locations)
+    s = Solver(25, 25, 5.5, lst_of_points, restaurant_loc)
     delivery_time, pizza_temperature, used_fuel = s.solve()
     # print(f"Kolejność dostawy pizzy: {s.gBest}")
     # print(f"Czas dostawy [min]: {delivery_time}")
@@ -27,4 +27,4 @@ def calculate():
     # print(f"Długość trasy [km]: {np.around(s.gBest_cost,2)}")
     # print(f"Zużyte paliwo: {used_fuel}")
     return json.dumps({"delivery_time": delivery_time, "pizza_temperature": pizza_temperature, 
-    "used_fuel": used_fuel, "order": s.gBest, "km": np.around(s.gBest_cost,2), "petrol_locations": petrol_locations})
+    "used_fuel": used_fuel, "order": s.gBest, "km": np.around(s.gBest_cost,2), "petrol_locations": s.petrol_locations})

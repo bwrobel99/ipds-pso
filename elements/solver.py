@@ -8,7 +8,7 @@ from typing import *
 class Solver:
 
     def __init__(self, num_swarm: int, num_iterations: int, fuel: float, locations: list
-                 , resturant_location: list, petrol_locations: list):
+                 , resturant_location: list):
         self.num_swarm = num_swarm
         self.num_iterations = num_iterations
         self.locations = locations
@@ -16,7 +16,7 @@ class Solver:
         self.speed = []
         self.fuel = fuel
         self.fuel_cons_per_100km = 20
-        self.petrol_locations = petrol_locations
+        self.petrol_locations = []
         self.gBest = []
         self.gBest_cost = 0
 
@@ -25,6 +25,30 @@ class Solver:
         lst[n-1] = lst[m-1]
         lst[m-1] = buff
         return lst
+
+    def random_petrol_location(self):
+        petrol_loc = []
+        x_lst = []
+        y_lst = []
+        x_lst.append(self.resturant_location[0])
+        y_lst.append(self.resturant_location[1])
+
+        for loc in self.locations:
+            x_lst.append(loc[0])
+            y_lst.append(loc[1])
+
+        x_max, y_max = max(x_lst), max(y_lst)
+        x_min, y_min = min(x_lst), min(y_lst)
+
+        x_range = list(np.linspace(x_min, x_max, 100))
+        y_range = list(np.linspace(y_min, y_max, 100))
+
+        for i in range(3):
+            rand_x = random.sample(x_range, k=1)
+            rand_y = random.sample(y_range, k=1)
+            petrol_loc.append([round(rand_x[0], 14), round(rand_y[0], 14)])
+
+        self.petrol_locations = petrol_loc
 
     def diff(self, a, b):
         list_of_diff = []
@@ -167,6 +191,7 @@ class Solver:
 
         self.gBest = 0
 
+        self.random_petrol_location()
 
         for i in range(self.num_swarm):  # Losowanie stada i predkosci
             list_of_particle.append(random.sample(range(1, l + 1), k=l))
@@ -230,10 +255,3 @@ class Solver:
         fuel_used = np.around(fuel_used, 2)
 
         return del_time, pizza_temp, fuel_used
-
-
-
-
-
-
-

@@ -1,22 +1,22 @@
-from flask import Flask
+from flask import Flask, request
+from flask_cors import CORS
 from .elements.solver import Solver
 from .elements.graph import Graph
 import json 
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/')
 def home():
     return 'Hello, World!'
 
 
-@app.route('/calculate')
+@app.route('/calculate', methods=['POST'])
 def calculate():
-    lst_of_points = [[19.9320, 50.0580],
-                     [19.9431, 50.0590], [19.9270, 50.0632],
-                     [19.9370, 50.0600]]
-    restaurant_loc = [19.9383, 50.0634]
+    data = json.loads(request.data)
+    lst_of_points = data['places'][1:]
+    restaurant_loc = data['places'][0]
     petrol_loactions = [[19.9380, 50.0578], [19.9500, 50.0643], [19.9499, 50.0599]]
     s = Solver(100, 100, lst_of_points, restaurant_loc, petrol_loactions)
     s.solve()

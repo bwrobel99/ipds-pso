@@ -1,5 +1,6 @@
 Flask==1.1.1
 Flask-Cors==3.0.10
+gunicorn==19.9.0
 httplib2==0.14.0
 matplotlib==3.3.3
 numpy==1.19.4

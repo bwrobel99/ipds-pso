@@ -64,7 +64,7 @@ class Graph:
         ax.scatter(points_long, points_lat, zorder=1, alpha=0.8, c='r', s=30, marker = 'o')
         ax.scatter(restaurant_loc[0], restaurant_loc[1], zorder = 1, alpha = 1, c='b', s=30, marker = 's')
         for i in range(len(petrol_long)):
-            ax.annotate(f'Stacja benzynowa nr{i}', xy=(petrol_long[i], petrol_lat[i]))
+            ax.annotate(f'SB{i}', xy=(petrol_long[i], petrol_lat[i]))
 
         ax.imshow(map, zorder=0, extent=self.bbox, aspect='equal')
         plt.show()

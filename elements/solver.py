@@ -46,7 +46,7 @@ class Solver:
         for i in range(3):
             rand_x = random.sample(x_range, k=1)
             rand_y = random.sample(y_range, k=1)
-            petrol_loc.append([round(rand_x[0], 4), round(rand_y[0], 4)])
+            petrol_loc.append([round(rand_x[0], 14), round(rand_y[0], 14)])
 
         self.petrol_locations = petrol_loc
 

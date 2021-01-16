@@ -7,14 +7,14 @@ from typing import *
 
 class Solver:
 
-    def __init__(self, num_swarm: int, num_iterations: int, locations: List
-                 , resturant_location: List, petrol_locations: List):
+    def __init__(self, num_swarm: int, num_iterations: int, fuel: float, locations: list
+                 , resturant_location: list, petrol_locations: list):
         self.num_swarm = num_swarm
         self.num_iterations = num_iterations
         self.locations = locations
         self.resturant_location = resturant_location
         self.speed = []
-        self.fuel = 6
+        self.fuel = fuel
         self.fuel_cons_per_100km = 20
         self.petrol_locations = petrol_locations
         self.gBest = []
@@ -28,7 +28,7 @@ class Solver:
 
     def diff(self, a, b):
         list_of_diff = []
-        b_buff = b[:]
+        b_buff = copy.deepcopy(b)
         if len(a) != len(b):
             print("Blad! Różne długości tablic")
             return -1
@@ -40,8 +40,8 @@ class Solver:
                     ind = b_buff.index(a[i])
                     if ind == -1:
                         return -1
-                    list_of_diff.append([i+1, ind])
-                    self.swap(b_buff, i+1, ind)
+                    list_of_diff.append([i+1, ind+1])
+                    self.swap(b_buff, i+1, ind+1)
         return list_of_diff
 
     def generate_speed(self, t):
@@ -95,21 +95,25 @@ class Solver:
             lst_of_cost.append(cal)
         return lst_of_cost
 
-    def check_diff(self, diff, dict):
+    def calculate_pizza_temp(self,delivery_time):
+        if delivery_time <= 10:
+            return 80
+        elif delivery_time > 40:
+            return 20
+        else:
+            return np.floor(800/delivery_time)
+
+    def calculate_pizza_temp_tab(self,delivery_time_tab):
+        pizza_temp_tab = []
+        for i in delivery_time_tab:
+            pizza_temp_tab.append(self.calculate_pizza_temp(i))
+        return pizza_temp_tab
+
+    def add_diff(self, diff, dict):
         check = False
         if diff:
             for p1 in range(len(diff)):  # Dodawanie powyższych predkosci do predkosci wcześniejszej
-                for c1 in range(len(dict)):  # Wedlug wzoru: v(i+1) = v(i) + [x(i) - pBest] + [x(i) - g Best]
-                    check = False
-                    if dict[c1]:
-                        if dict[c1][0] == diff[p1][0] and dict[c1][1] == diff[p1][1]:
-                            dict[c1].clear()  # Sprawdzanie powtorzenia dla diff 1
-                            check = True
-                        elif dict[c1][0] == diff[p1][1] and dict[c1][1] == diff[p1][0]:
-                            dict[c1].clear()
-                            check = True
-                if not check:
-                    dict.append(diff[p1])
+                dict.append(diff[p1])
 
     def is_fuel_enough(self, particle):
         if particle:
@@ -136,7 +140,8 @@ class Solver:
                 else:
                     route += 1000 * 111 * self.route_between_points(self.resturant_location, self.petrol_locations[self.gBest[i] - 10])
                 time = self.calculate_time(route)
-                delivery_time.append(time/60 + (5 * i))
+                time = time/60 + (5 * (i+1))
+                delivery_time.append(np.around(time,decimals=2))
 
             else:
                 if self.gBest[i] >= 10:
@@ -147,22 +152,25 @@ class Solver:
                     route += 1000 * 111 * self.route_between_points(self.locations[self.gBest[i - 1] - 1], self.locations[self.gBest[i] - 1])
 
                 time = self.calculate_time(route)
+                time = time/60 + (5 * (i+1))
 
-                delivery_time.append(time/60 + (5 * i))
+                delivery_time.append(np.around(time, decimals=2))
         return delivery_time
 
     def solve(self):
         list_of_particle = []
         dict_of_vel = {}
         list_of_pBest = []
+        cnt = 0
 
         l = len(self.locations)
 
         self.gBest = 0
 
+
         for i in range(self.num_swarm):  # Losowanie stada i predkosci
             list_of_particle.append(random.sample(range(1, l + 1), k=l))
-            dict_of_vel[i] = [(random.sample(range(1, l + 1), k=2))]
+            dict_of_vel[i] = [(random.sample(range(1, l + 1), k=2)), (random.sample(range(1, l + 1), k=2))]
 
         list_of_pBest = copy.deepcopy(list_of_particle)  # Obliczanie kosztu dla wylosowanego stada
         lst_of_pBest_cost = self.calculate_full_cost(
@@ -171,13 +179,15 @@ class Solver:
         index_gBest = lst_of_pBest_cost.index(self.gBest_cost)
         self.gBest = list_of_pBest[index_gBest]
 
+
+
         for i in range(self.num_iterations):
             for it in range(self.num_swarm):
-                diff1 = self.diff(list_of_particle[it],
-                                  list_of_pBest[it])  # Wyznaczanie różnic: cząsteczka - pBest [x(i) - pBest]
-                diff2 = self.diff(list_of_particle[it], self.gBest)  # cząsteczka - gBest [x(i) - gBest]
-                self.check_diff(diff1, dict_of_vel[it])
-                self.check_diff(diff2, dict_of_vel[it])
+                diff1 = self.diff(list_of_particle[it], list_of_pBest[it])  # Wyznaczanie różnic: cząsteczka - pBest [x(i) - pBest]
+                diff2 = self.diff(list_of_particle[it], self.gBest)
+                # cząsteczka - gBest [x(i) - gBest]
+                self.add_diff(diff1, dict_of_vel[it])
+                self.add_diff(diff2, dict_of_vel[it])
                 for el in range(len(dict_of_vel[it])):
                     if dict_of_vel[it][el]:  # Zastosowanie predkosci dla stada
                         list_of_particle[it] = self.swap(
@@ -185,10 +195,12 @@ class Solver:
             costs = self.calculate_full_cost(list_of_particle, self.locations)
             for it in range(self.num_swarm):  # Aktualizowanie pBest oraz gBest
                 if costs[it] < lst_of_pBest_cost[it]:
-                    list_of_pBest[it] = list_of_particle[it]
+                    list_of_pBest[it] = copy.deepcopy(list_of_particle[it])
                     lst_of_pBest_cost[it] = costs[it]
                 if costs[it] < self.gBest_cost:
-                    self.gBest = list_of_particle[it]
+                    self.gBest = copy.deepcopy(list_of_particle[it])
+                    self.gBest_cost = costs[it]
+                    cnt = i+1
 
         fuel_enough = self.is_fuel_enough(copy.copy(self.gBest))
 
@@ -213,7 +225,14 @@ class Solver:
 
 
         del_time = self.count_time()
-        print(del_time)
+        pizza_temp = self.calculate_pizza_temp_tab(del_time)
+        fuel_used = fuel_need = self.gBest_cost / 100 * self.fuel_cons_per_100km
+        fuel_used = np.around(fuel_used, 2)
+
+        return del_time, pizza_temp, fuel_used
+
+
+
 
 
 

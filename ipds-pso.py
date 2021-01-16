@@ -14,53 +14,17 @@ def main():
                      [19.9370, 50.0600], [19.940, 50.0682]]
     restaurant_loc = [19.9383, 50.0634]
     petrol_loactions = [[19.9380, 50.0578], [19.9500, 50.0643], [19.9499, 50.0599]]
-    s = Solver(25, 25, lst_of_points, restaurant_loc, petrol_loactions)
-
-    s.solve()
+    s = Solver(25, 25, 5.5, lst_of_points, restaurant_loc, petrol_loactions)
+    delivery_time, pizza_temperature, used_fuel = s.solve()
     print(f"Kolejność dostawy pizzy: {s.gBest}")
+    print(f"Czas dostawy [min]: {delivery_time}")
+    print(f"Temperatura pizzy [st.C]: {pizza_temperature}")
     print(f"Długość trasy [km]: {np.around(s.gBest_cost,2)}")
+    print(f"Zużyte paliwo: {used_fuel}")
     right_order = s.gBest
     graph = Graph()
     longitudes , latitudes = graph.upgrade_points(restaurant_loc=restaurant_loc, right_order=right_order, lst_of_points=lst_of_points, petrol_loactions=petrol_loactions)
     graph.show_graph(longitudes=longitudes, latitudes=latitudes, petrol_locations=petrol_loactions, restaurant_loc=restaurant_loc, lst_of_points=lst_of_points)
-
-    # errors = []
-    # errors1 = []
-    # bad = []
-    # cnt = 0
-    # cnt1 = 0
-    # buff = []
-    # buff_tab = []
-    # for i in range(20,101,2):
-    #     si = Solver(i, 100, lst_of_points, restaurant_loc, petrol_loactions)
-    #     for it in range(10):
-    #         si.solve()
-    #         if si.gBest_cost > 77:
-    #             cnt += 10
-    #         if si.gBest_cost > 76:
-    #             cnt1 += 10
-    #     errors.append(cnt)
-    #     errors1.append(cnt1)
-    #     cnt = 0
-    #     cnt1 = 0
-    #     print(i)
-    # print(errors)
-    # print(errors1)
-    # plt.bar(range(20,101,2),[100 - el for el in errors])
-    # plt.title("Skuteczność algorytmu w zależności od liczby iteracji")
-    # plt.xlabel("Liczba iteracji")
-    # plt.ylabel("Sktueczność algorytmu [%]")
-    # plt.show()
-    # plt.figure()
-    # plt.bar(range(20, 101, 2), [100 - el for el in errors1])
-    # plt.title("Skuteczność algorytmu w zależności od liczby iteracji")
-    # plt.xlabel("Liczba iteracji")
-    # plt.ylabel("Sktueczność algorytmu [%]")
-    # plt.show()
-
-
-
-
 
 if __name__ == "__main__":
     main()

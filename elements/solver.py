@@ -7,14 +7,14 @@ from typing import *
 
 class Solver:
 
-    def __init__(self, num_swarm: int, num_iterations: int, locations: List
-                 , resturant_location: List, petrol_locations: List):
+    def __init__(self, num_swarm: int, num_iterations: int, fuel: float, locations: list
+                 , resturant_location: list, petrol_locations: list):
         self.num_swarm = num_swarm
         self.num_iterations = num_iterations
         self.locations = locations
         self.resturant_location = resturant_location
         self.speed = []
-        self.fuel = 60
+        self.fuel = fuel
         self.fuel_cons_per_100km = 20
         self.petrol_locations = petrol_locations
         self.gBest = []
@@ -167,6 +167,7 @@ class Solver:
 
         self.gBest = 0
 
+
         for i in range(self.num_swarm):  # Losowanie stada i predkosci
             list_of_particle.append(random.sample(range(1, l + 1), k=l))
             dict_of_vel[i] = [(random.sample(range(1, l + 1), k=2)), (random.sample(range(1, l + 1), k=2))]
@@ -224,9 +225,11 @@ class Solver:
 
 
         del_time = self.count_time()
-        print(f"Czas dostawy [min]: {del_time}")
         pizza_temp = self.calculate_pizza_temp_tab(del_time)
-        print(f"Temperatura pizzy [st.C]: {pizza_temp}")
+        fuel_used = fuel_need = self.gBest_cost / 100 * self.fuel_cons_per_100km
+        fuel_used = np.around(fuel_used, 2)
+
+        return del_time, pizza_temp, fuel_used
 
 
 
